@@ -1,0 +1,11 @@
+python train.py  \
+-task hybrid -mode test -batch_size 3000 \
+--hybrid_loss \
+-test_batch_size 500 \
+-test_from /home/hnwang/ACL2020/BERT/model_step_24000.pt \
+-bert_data_path /home/hnwang/ACL2020/New_title_data/bert_data/cnndm \
+-log_file ../logs/val_hybrid_bert_cnndm_hyconnect_title_03.log \
+-model_path ../models_hybrid_cnndm_hyconnect/ \
+-use_interval true -visible_gpus 1 \
+-max_pos 512 -max_length 200 -alpha 0.95 -min_length 50 \
+-result_path ../results/hybrid_bert_cnndm_hyconnect_title/hyconnect03 
