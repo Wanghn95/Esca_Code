@@ -1,1 +1,0 @@
-python train.py --pairwise -ext_layers 1 -model_path ../ext_model_test -task ext -mode train -bert_data_path /home/ybai/downloads/bert_data_cnndm_final/cnndm -ext_dropout 0.1 -lr 2e-3 -visible_gpus 1,2,3 -report_every 50 -save_checkpoint_steps 1000 -batch_size 3000 -train_steps 100000 -accum_count 2 -log_file ../logs/ext_test -use_interval true -warmup_steps 10000 -max_pos 512
