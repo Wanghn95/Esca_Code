@@ -103,7 +103,7 @@ python train.py -task hybrid -mode validate -batch_size 15000 --hybrid_loss -con
 #### RELVANCE:
 We searched a lot of literature and find the CNN/DailyMail dataset have a version with title. but need some binary conversion is required to restore the original version, then we add the title information into reference summary as the dataset to test the relavance of system.
 
-#### Novelty:
+#### NOVELTY:
 Inorder to test the diversity of System, we use the Advanced unsupervised extraction system `PacSum`. We delete the first five sentences from the original text as INPUT and enter it into Pacsums and we take the output as reference to test the performance of Model. 
 
 
