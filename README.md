@@ -12,7 +12,6 @@ The two sub-directorys conclude the BERT version and Transforer version code of 
 * How to Train the model & hybrid model(extractor and abstractor).
 * How to build dataset for model test. 
 * How to Test the model.
-* The hyper-parameters you need to pay attention to.
 
 ## Requirements
 * Python 3.6
