@@ -63,6 +63,33 @@ python preprocess.py -mode format_to_bert -raw_path JSON_PATH -save_path BERT_DA
 ```
 * `Bert_data_path` is the target directory to save the generated binary files (bert_data).
 
+## How to Train the hybrid model (extractor and abstractor).
+
+### 1. Pretrain the extractor
+```
+python train.py --pairwise -task ext -mode train -bert_data_path BERT_DATA_PATH -ext_dropout 0.1 -model_path MODEL_PATH -lr 2e-3 -visible_gpus x -report_every 100 -save_checkpoint_steps 1000 -batch_size 3000 -train_steps 100000 -accum_count 2 -log_file LOG_PATH -use_interval true -warmup_steps 10000 -max_pos 512
+```
+
+* We use the cross entropy loss to train the extractor, expecting better parameters. Then we proposed a new loss `pairwise loss` to learn the relationship between sentences.
+
+### 2. Pretrain the abstractor
+```
+python train.py -task abs -mode train -bert_data_path BERT_DATA_PATH -dec_dropout 0.2  -sep_optim true -lr_bert 0.002 -lr_dec 0.2 -save_checkpoint_steps 2000 -batch_size 140 -train_steps 200000 -report_every 50 -accum_count 4 -use_bert_emb true -use_interval true -warmup_steps_bert 20000 -warmup_steps_dec 10000 -max_pos 512 -visible_gpus x  -log_file LOG_PATH
+```
+* 
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
