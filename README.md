@@ -76,9 +76,13 @@ python train.py --pairwise -task ext -mode train -bert_data_path BERT_DATA_PATH 
 ```
 python train.py -task abs -mode train -bert_data_path BERT_DATA_PATH -dec_dropout 0.2  -sep_optim true -lr_bert 0.002 -lr_dec 0.2 -save_checkpoint_steps 2000 -batch_size 140 -train_steps 200000 -report_every 50 -accum_count 4 -use_bert_emb true -use_interval true -warmup_steps_bert 20000 -warmup_steps_dec 10000 -max_pos 512 -visible_gpus x  -log_file LOG_PATH
 ```
-* 
+* We reference the Pointer-Generator network structure, and use the P_gen calculates the vocab_prob based on ... And you can choose not to pretrain the abstractor because of it'll be trained in Hybrid mode, too.
 
-
+### 3. Train the Hybrid
+```
+python train.py -temp_dir=TEMP_PATH -lr_bert 0.002 -lr_dec 0.2 -task hybrid -mode train -model_path=MODEL_PATH -bert_data_path BERT_DATA_PATH -ext_dropout 0.1 -visible_gpus x -report_every 50 -save_checkpoint_steps 2000 -batch_size 500 -train_steps 200000 -accum_count 5 -log_file LOG_PATH -use_interval true -warmup_steps_bert 20000 -warmup_steps_dec 10000 -max_pos 512
+```
+* there we have three extra parameters methods: `--oracle/--hybrid_connector/--hybrid_loss/` to train hybrid model, `Overlap, NoT Juxtaposition`.
 
 
 
