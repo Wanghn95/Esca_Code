@@ -8,9 +8,9 @@
 
 The two sub-directorys conclude the BERT version and Transforer version code of ESCA.
 * The required environment of the code.
-* How to build dataset for model train correlation. 
+* How to build dataset for model train. 
 * How to Train the model & hybrid model(extractor and abstractor).
-* How to build dataset for model test correlation. 
+* How to build dataset for model test. 
 * How to Test the model.
 * The hyper-parameters you need to pay attention to.
 
@@ -59,31 +59,52 @@ python preprocess.py -mode format_to_lines -raw_path RAW_PATH -save_path JSON_PA
 
 #### 5> Format to pt Files
 ```
-python preprocess.py -mode format_to_bert -raw_path JSON_PATH -save_path BERT_DATA_PATH  -lower -n_cpus 1 -log_file ../logs/preprocess.log
+python preprocess.py -mode format_to_bert -raw_path JSON_PATH -save_path DATA_PATH  -lower -n_cpus 1 -log_file ../logs/preprocess.log
 ```
 * `Bert_data_path` is the target directory to save the generated binary files (bert_data).
 
-## How to Train the hybrid model (extractor and abstractor).
+## How to Train the hybrid model (extractor and abstractor)?
 
 ### 1. Pretrain the extractor
 ```
-python train.py --pairwise -task ext -mode train -bert_data_path BERT_DATA_PATH -ext_dropout 0.1 -model_path MODEL_PATH -lr 2e-3 -visible_gpus x -report_every 100 -save_checkpoint_steps 1000 -batch_size 3000 -train_steps 100000 -accum_count 2 -log_file LOG_PATH -use_interval true -warmup_steps 10000 -max_pos 512
+python train.py --pairwise -task ext -mode train -data_path DATA_PATH -ext_dropout 0.1 -model_path MODEL_PATH -lr 2e-3 -visible_gpus x -report_every 100 -save_checkpoint_steps 1000 -batch_size 3000 -train_steps 100000 -accum_count 2 -log_file LOG_PATH -use_interval true -warmup_steps 10000 -max_pos 512
 ```
 
 * We use the cross entropy loss to train the extractor, expecting better parameters. Then we proposed a new loss `pairwise loss` to learn the relationship between sentences.
 
 ### 2. Pretrain the abstractor
 ```
-python train.py -task abs -mode train -bert_data_path BERT_DATA_PATH -dec_dropout 0.2  -sep_optim true -lr_bert 0.002 -lr_dec 0.2 -save_checkpoint_steps 2000 -batch_size 140 -train_steps 200000 -report_every 50 -accum_count 4 -use_bert_emb true -use_interval true -warmup_steps_bert 20000 -warmup_steps_dec 10000 -max_pos 512 -visible_gpus x  -log_file LOG_PATH
+python train.py -task abs -mode train -data_path DATA_PATH -dec_dropout 0.2  -sep_optim true -lr_bert 0.002 -lr_dec 0.2 -save_checkpoint_steps 2000 -batch_size 140 -train_steps 200000 -report_every 50 -accum_count 4 -use_bert_emb true -use_interval true -warmup_steps_bert 20000 -warmup_steps_dec 10000 -max_pos 512 -visible_gpus x  -log_file LOG_PATH
 ```
 * We reference the Pointer-Generator network structure, and use the P_gen calculates the vocab_prob based on ... And you can choose not to pretrain the abstractor because of it'll be trained in Hybrid mode, too.
 
 ### 3. Train the Hybrid
 ```
-python train.py -temp_dir=TEMP_PATH -lr_bert 0.002 -lr_dec 0.2 -task hybrid -mode train -model_path=MODEL_PATH -bert_data_path BERT_DATA_PATH -ext_dropout 0.1 -visible_gpus x -report_every 50 -save_checkpoint_steps 2000 -batch_size 500 -train_steps 200000 -accum_count 5 -log_file LOG_PATH -use_interval true -warmup_steps_bert 20000 -warmup_steps_dec 10000 -max_pos 512
+python train.py -train_from_extractor EXTRACTOR_CHECKPOINT_PATH -train_from_abstractor ABSTRACTOR_CHECKPOINT_PATH --hybrid_loss -lr 0.002 -task hybrid -mode train -model_path=MODEL_PATH -data_path DATA_PATH -ext_dropout 0.1 -visible_gpus x -report_every 50 -save_checkpoint_steps 1800 -batch_size 2000 -train_steps 200000 -accum_count 5  -log_file LOG_PATH -use_interval true -warmup_steps_bert 20000 -warmup_steps_dec 10000 -max_pos 512 
 ```
-* there we have three extra parameters methods: `--oracle/--hybrid_connector/--hybrid_loss/` to train hybrid model, `Overlap, NoT Juxtaposition`.
+* there we offer three extra parameters methods: `--oracle/--hybrid_connector/--hybrid_loss/` to train hybrid model, `Overlap, NoT Juxtaposition`.
 
+#### The transformer version is like the above we provide...
+
+## How to val and test the MODEL by ROUGE or builded dataset?
+
+### 1.Test by ROUGE：
+```
+python train.py -test_from MODEL_PATH -task hybrid -mode test -batch_size 3000 -test_batch_size 500 -data_path DATA_PATH -log_file LOG_PATH -model_path MODEL_PATH -sep_optim true -use_interval true -visible_gpus x -max_pos 512 -max_length 200 -alpha 0.95 -min_length 50 -result_path RESULT_PATH
+```
+### 2.Validate by ROUGE:
+```
+python train.py -task hybrid -mode validate -batch_size 15000 --hybrid_loss -control Rel -test_batch_size 15000 -data_path DATA_PATH -log_file LOG_PATH -model_path MODEL_PATH -sep_optim true -use_interval true -visible_gpus 2 -max_pos 512 -max_length 200 -alpha 0.95 -min_length 50 -result_path RESULT_PATH -test_all 
+```
+* You can choose the `-test_all` parameter, the system'll load all checkpoints and select the top ones to generate summaries, IF you have enough time.
+
+### 3.Build dataset for test:
+
+#### RELVANCE:
+We searched a lot of literature and find the CNN/DailyMail dataset have a version with title. but need some binary conversion is required to restore the original version, then we add the title information into reference summary as the dataset to test the relavance of system.
+
+#### Novelty:
+Inorder to test the diversity of System, we use the Advanced unsupervised extraction system `PacSum`. We delete the first five sentences from the original text as INPUT and enter it into Pacsums and we take the output as reference to test the performance of Model. 
 
 
 
