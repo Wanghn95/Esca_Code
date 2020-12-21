@@ -2,7 +2,7 @@
 
 **Updates Dec 14 2020** ： This is our first version , we'll keep updating the repository.  
 
-**Code for AAAI 2021 paper [Exploring Explainable Selection to Control Abstract Generation]**
+**Code for AAAI 2021 paper [Exploring Explainable Selection to Control Abstractive Summarization]**
 
 **In this repository, we can provide you the following things:**
 
