@@ -27,6 +27,9 @@ The two sub-directorys conclude the BERT version and Transforer version code of 
 **Error Handling**: If you encounter the error message `Cannot open exception db file for reading: /path/to/ROUGE-1.5.5/data/WordNet-2.0.exc.db` when using pyrouge, the problem can be solved from [here](https://github.com/tagucci/pythonrouge#error-handling) and you need to be patient because the ROUGE is very queer.
 
 ## Train dataset
+
+### Download the processed data link：[Pre-processed data](https://drive.google.com/open?id=1DN7ClZCCXsk2KegmC6t4ClBwtAf5galI)
+
 ### 1.Download the precessed dataset
 
 Precessed dataset will be pulled on there later, you can unzip the zipfile and put `.pt` files into `bert_data`.
